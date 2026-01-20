@@ -1,1 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Orfeo Kaplow – Developer Portfolio</title>
+  <meta name="description" content="Developer portfolio for Apple Family Controls (Screen Time / Family Controls) request submission." />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --border: #1f2933;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+      background: linear-gradient(180deg, #020617, #020617 40%, #020617);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      padding: 64px 24px 48px;
+      border-bottom: 1px solid var(--border);
+      background: radial-gradient(1200px 400px at 50% -200px, rgba(56,189,248,0.15), transparent);
+    }
+    .container { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+    h1 { font-size: 2.5rem; margin: 0 0 8px; }
+    h2 { font-size: 1.6rem; margin-top: 48px; }
+    h3 { font-size: 1.2rem; margin-top: 24px; }
+    p { color: var(--text); }
+    .muted { color: var(--muted); }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      background: rgba(56,189,248,0.15);
+      color: var(--accent);
+      margin-right: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    footer {
+      margin-top: 64px;
+      padding: 32px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    ul { padding-left: 18px; }
+    li { margin: 6px 0; }
+    .placeholder { color: #fbbf24; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  </style>
+</head>
+<body>
 
+<header>
+  <div class="container">
+    <h1>Orfeo Kaplow</h1>
+    <p class="muted">Student Software Developer · iOS / Mobile / Game Development</p>
+    <div style="margin-top:12px">
+      <span class="badge">iOS & SwiftUI</span>
+      <span class="badge">MAUI / .NET</span>
+      <span class="badge">Unity (C#)</span>
+      <span class="badge">Computer Science Student</span>
+    </div>
+    <p style="margin-top:16px">
+      This portfolio is provided as part of an <strong>Apple Family Controls / Screen Time API request</strong>.
+      It describes my background, technical experience, intended app behavior, and compliance with Apple’s
+      policies regarding user privacy, data minimization, and child safety.
+    </p>
+  </div>
+</header>
+
+<main class="container">
+
+  <section id="about">
+    <h2>About Me</h2>
+    <div class="card">
+      <p>
+        My name is <strong>Orfeo Kaplow</strong>. I am a <strong>computer science student at TU Berlin</strong>
+        with a strong interest in mobile app development, privacy-conscious software design, and user-focused
+        interfaces. I have prior experience in game development and mobile application development, including
+        iOS apps built with SwiftUI.
+      </p>
+      <p>
+        I have completed a <strong>game development internship</strong>, lived abroad for one year (New York),
+        and regularly work on personal and academic software projects.
+      </p>
+    </div>
+  </section>
+
+  <section id="developer-info">
+    <h2>Developer Information</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Identity</h3>
+        <ul>
+          <li><strong>Name:</strong> Orfeo Kaplow</li>
+          <li><strong>Role:</strong> Individual Developer / Student</li>
+          <li><strong>Affiliation:</strong> Technische Universität Berlin</li>
+          <li><strong>Country:</strong> Germany</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Contact</h3>
+        <ul>
+          <li><strong>Email:</strong> <span class="placeholder">[your-email@example.com]</span></li>
+          <li><strong>Developer Website:</strong> This page</li>
+          <li><strong>Apple Developer Team ID:</strong> <span class="placeholder">[ADD TEAM ID]</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <h2>Relevant Projects</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Planana (Mobile App)</h3>
+        <p class="muted">Appointment planning & expense sharing app</p>
+        <ul>
+          <li>Cross-platform mobile app</li>
+          <li>Focus on usability and clear consent-driven interactions</li>
+          <li>No hidden data collection</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>iOS Chess Application</h3>
+        <p class="muted">SwiftUI-based chess app</p>
+        <ul>
+          <li>Custom game engine and UI</li>
+          <li>Clean, deterministic state management</li>
+          <li>Strong focus on correctness and transparency</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Game Development Projects</h3>
+        <p class="muted">Unity (C#)</p>
+        <ul>
+          <li>Card games, strategy games, and runners</li>
+          <li>Experience with multiplayer and input systems</li>
+          <li>Understanding of sandboxed, rule-based systems</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="family-controls">
+    <h2>Family Controls / Screen Time API Use</h2>
+    <div class="card">
+      <p>
+        I am requesting access to Apple’s <strong>Family Controls (Screen Time) APIs</strong> solely for
+        legitimate, user-facing functionality that empowers users (and guardians) to understand and manage
+        device usage in a transparent and respectful manner.
+      </p>
+
+      <h3>Intended Use</h3>
+      <ul>
+        <li>Allow users or parents/guardians to configure app usage limits</li>
+        <li>Display Screen Time–related information clearly and accurately</li>
+        <li>Support parental consent and explicit user authorization flows</li>
+      </ul>
+
+      <h3>Non-Use Guarantees</h3>
+      <ul>
+        <li>No data resale or third-party sharing</li>
+        <li>No behavioral profiling or advertising</li>
+        <li>No collection beyond what is strictly necessary for functionality</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <h2>Privacy & Data Protection</h2>
+    <div class="card">
+      <p>
+        Privacy is a core design principle in all of my projects. Any application using Family Controls APIs
+        will adhere strictly to Apple’s privacy requirements and the GDPR.
+      </p>
+      <ul>
+        <li>Explicit user consent before any Screen Time access</li>
+        <li>Clear in-app explanations of why permissions are requested</li>
+        <li>Data minimization: only transient or locally stored data where possible</li>
+        <li>No tracking across apps or services</li>
+      </ul>
+
+      <p class="mono muted">
+        Placeholder – Privacy Policy URL: <span class="placeholder">[ADD PRIVACY POLICY LINK]</span>
+      </p>
+    </div>
+  </section>
+
+  <section id="compliance">
+    <h2>Compliance Statement</h2>
+    <div class="card">
+      <p>
+        I confirm that any app using Family Controls / Screen Time APIs will:
+      </p>
+      <ul>
+        <li>Comply with the Apple Developer Program License Agreement</li>
+        <li>Follow App Store Review Guidelines, especially sections on privacy and children</li>
+        <li>Use APIs only for their intended purpose</li>
+        <li>Provide full transparency to users and reviewers</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="future">
+    <h2>Future Plans</h2>
+    <div class="card">
+      <p>
+        My long-term goal is to build high-quality, ethical consumer software with a strong focus on
+        user autonomy, safety, and privacy. Access to Family Controls APIs is essential for developing
+        responsible tools in this space.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <p>
+      © <span id="year"></span> Orfeo Kaplow · Developer Portfolio for Apple Review
+    </p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
