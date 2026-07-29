@@ -1,244 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Orfeo Kaplow – Developer Portfolio</title>
-  <meta name="description" content="Developer portfolio for Apple Family Controls (Screen Time / Family Controls) request submission." />
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card: #111827;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --accent: #38bdf8;
-      --border: #1f2933;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
-      background: linear-gradient(180deg, #020617, #020617 40%, #020617);
-      color: var(--text);
-      line-height: 1.6;
-    }
-    header {
-      padding: 64px 24px 48px;
-      border-bottom: 1px solid var(--border);
-      background: radial-gradient(1200px 400px at 50% -200px, rgba(56,189,248,0.15), transparent);
-    }
-    .container { max-width: 980px; margin: 0 auto; padding: 0 24px; }
-    h1 { font-size: 2.5rem; margin: 0 0 8px; }
-    h2 { font-size: 1.6rem; margin-top: 48px; }
-    h3 { font-size: 1.2rem; margin-top: 24px; }
-    p { color: var(--text); }
-    .muted { color: var(--muted); }
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      background: rgba(56,189,248,0.15);
-      color: var(--accent);
-      margin-right: 6px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-      margin-top: 16px;
-    }
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-    }
-    .card-link {
-      display: block;
-      color: inherit;
-      text-decoration: none;
-      transition: border-color 0.2s ease;
-    }
-    .card-link:hover,
-    .card-link:focus-visible {
-      border-color: var(--accent);
-    }
-    footer {
-      margin-top: 64px;
-      padding: 32px 24px;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-    a { color: var(--accent); text-decoration: none; }
-    ul { padding-left: 18px; }
-    li { margin: 6px 0; }
-    .placeholder { color: #fbbf24; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orfeo Kaplow</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<header>
-  <div class="container">
-    <h1>Orfeo Kaplow</h1>
-    <p class="muted">Student Software Developer · iOS / Mobile / Game Development</p>
-    <div style="margin-top:12px">
-      <span class="badge">iOS & SwiftUI</span>
-      <span class="badge">MAUI / .NET</span>
-      <span class="badge">Unity (C#)</span>
-      <span class="badge">Computer Science Student</span>
-    </div>
-  </div>
-</header>
-
-<main class="container">
-
-  <section id="about">
-    <h2>About Me</h2>
-    <div class="card">
-      <p>
-        My name is <strong>Orfeo Kaplow</strong>. I am a <strong>computer science student at TU Berlin</strong>
-        with a strong interest in mobile app development, privacy-conscious software design, and user-focused
-        interfaces. I have prior experience in game development and mobile application development, including
-        iOS apps built with SwiftUI.
-      </p>
-      <p>
-        I have completed a <strong>game development internship</strong>, lived abroad for one year (New York),
-        and regularly work on personal and academic software projects.
-      </p>
-    </div>
-  </section>
-
-  <section id="developer-info">
-    <h2>Developer Information</h2>
-    <div class="grid">
-      <div class="card">
-        <h3>Identity</h3>
-        <ul>
-          <li><strong>Name:</strong> Orfeo Kaplow</li>
-          <li><strong>Role:</strong> Individual Developer / Student</li>
-          <li><strong>Affiliation:</strong> Technische Universität Berlin</li>
-          <li><strong>Country:</strong> Germany</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section id="projects">
-    <h2>Relevant Projects</h2>
-    <div class="grid">
-      <a class="card card-link" href="chess-journal.html" aria-label="Open Chess Journal project page">
-        <h3>Chess Journal</h3>
-        <p class="muted">SwiftUI/Flutter-based chess app for iOS/Android</p>
-        <ul>
-          <li>Custom chess logic and UI</li>
-          <li>For logging chess casual or professional games </li>
-          <li>Comes with extra chess tools like a Chess Clock</li>
-        </ul>
-      </a>
-      <a class="card card-link" href="repsplus.html" aria-label="Open Reps+ project page">
-        <h3>Reps+</h3>
-        <p class="muted">iOS app for tracking workout progress</p>
-        <ul>
-          <li>Custom workout tracking and analytics</li>
-          <li>For logging and analyzing fitness activities</li>
-        </ul>
-      </a>
-      <a class="card card-link" href="chuzzles.html" aria-label="Open Chuzzles privacy policy page">
-        <h3>Chuzzles</h3>
-        <p class="muted">Free cross-platform chess puzzle app (iOS, Android, Windows, macOS)</p>
-        <ul>
-          <li>Play local chess puzzles offline</li>
-          <li>Includes different puzzle modi</li>
-        </ul>
-      </a>
-          <li>Comes with extra chess tools like a Chess Clock</li>
-        </ul>
-      </a>
-      <a class="card card-link" href="betterboxd.html" aria-label="Open Betterboxd project page">
-        <h3>Betterboxd</h3>
-        <p class="muted">iOS app inspired by Letterboxd</p>
-        <ul>
-          <li>Track films and build personal watchlists</li>
-          <li>Designed as a social movie discovery experience</li>
-          <li>Currently in active development</li>
-        </ul>
-      </a>
-      <a class="card card-link" href="doomstopper.html" aria-label="Open DoomStopper project page">
-        <h3>DoomStopper</h3>
-        <p class="muted">iOS app for blocking distracting apps</p>
-        <ul>
-          <li>Blocks access to distracting apps using NFC technology</li>
-          <li>Simple and free to use</li>
-          <li>Currently in active development</li>
-        </ul>
-      </a>
-          <li>Currently in active development</li>
-        </ul>
-      </a>
-      <a class="card card-link" href="chuzzles.html" aria-label="Open Chuzzles privacy policy page">
-        <h3>Chuzzles</h3>
-        <p class="muted">Free cross-platform chess puzzle app (iOS, Android, Windows, macOS)</p>
-        <ul>
-          <li>Play local chess puzzles offline</li>
-          <li>Includes different puzzle modi</li>
-        </ul>
-      </a>
-      <a class="card card-link" href="chessmanager.html" aria-label="Open Chess Manager privacy policy page">
-        <h3>Chess Manager</h3>
-        <p class="muted">iOS/ipadOS/macos app for creating and managing chess tournaments</p>
-        <ul>
-          <li>Create and manage tournaments offline</li>
-          <li>Swiss, Round Robin</li>
-          <li>Export tournament data to PDF or CSV</li>
-        </ul>
-      </a>
-      <div class="card">
-        <h3>Game Development Projects</h3>
-        <p class="muted">Unity (C#)</p>
-        <ul>
-          <li>Card games, strategy games, and runners</li>
-          <li>Experience with multiplayer and input systems</li>
-          <li>Understanding of sandboxed, rule-based systems</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Doom Stopper iOS app</h3>
-        <p class="muted" style="color: yellow;">Work in progress</p>
-        <ul>
-          <li>For blocking access to distracting apps using NFC tech</li>
-          <li>Simple and free </li>
-          <li>Will be done by the end of 2026</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section id="future">
-    <h2>Future Plans</h2>
-    <div class="card">
-      <p>
-        My long-term goal is to build high-quality, ethical consumer software with a strong focus on
-        user autonomy, safety, and privacy. I also want to create games that are fun and unique. 
-      </p>
-    </div>
-  </section>
-
-</main>
-
-<footer>
-  <div class="container">
+    <h1>About Me</h1>
     <p>
-      © <span id="year"></span> Orfeo Kaplow · Developer Portfolio
+        Hi! My name is Orfeo Kaplow, I am a computer science student at TU Berlin. 
+        What started as a passion for video games and game dev, slowly turned into 
+        curiosity for software development in general. I taught myself web development
+        first, then grew my knowledge in building for mobile, learning Flutter and Swift.
+        Now, mobile development has really stuck with me, and I have already built and released
+        for iOS and Android. My current skills are:
     </p>
-  </div>
-</footer>
-
-<script>
-  document.getElementById('year').textContent = new Date().getFullYear();
-</script>
-
+    <ul>
+        <li>C# + Unity</li>
+        <li>Swift, (SwiftUI)</li>
+        <li>Flutter, Dart</li>
+    </ul>
+    <p>
+        Outside of my personal projects, I have gathered real-life development experience here:
+    </p>
+    <ul>
+        <li>Game Development Internship at <a class="colored-link" href="https://www.gameduell.com/gd/">GameDuell</a></li>
+        <li>App Developer at <a class="colored-link" href="https://www.idencom.com/">Idencom Germany</a> (current employment)</li>
+    </ul>
+    <h1>My Projects</h1>
+    <div class="projects-overview"> 
+        <div class="project-card">
+            <a href="chessjournal.html">
+                <div class="project-card-header">
+                    <img src="images/chess-journal-icon.png" alt="Chess Journal App Icon" width="64" height="64">
+                    <h3>Chess Journal</h3>
+                </div>
+                <p>A simple journaling app for over the board chess games, with extra features like puzzles and a chess clock.</p>
+            </a>
+        </div>
+        <div class="project-card">
+            <a href="chessmanager.html">
+                <div class="project-card-header">
+                    <img src="images/chess-manager-icon.png" alt="Chess Manager App Icon" width="64" height="64">
+                    <h3>Chess Manager</h3>
+                </div>
+                <p>A comprehensive chess management app with features for tournament organization and player statistics. 
+                Built for iOS, iPadOS and MacOS</p>
+            </a>
+        </div>
+        <div class="project-card">
+            <a href="repsplus.html">
+                <div class="project-card-header">
+                    <img src="images/repsplus-icon.png" alt="Reps+ App Icon" width="64" height="64">
+                    <h3>Reps+</h3>
+                </div>
+                <p>iOS app for tracking workouts and exercises. Easy to use and packed with features like a muscle 
+                    heat map and routine planning.</p>
+            </a>
+        </div>
+        <div class="project-card">
+            <a href="doom.html">
+                <div class="project-card-header">
+                    <img src="images/doom-icon.png" alt="DoomStopper App Icon" width="64" height="64">
+                    <h3>Doom</h3>
+                </div>
+                <p>A free iOS app for blocking and restricting apps or websites on your device. Focused on privacy and 
+                    user control.</p>
+            </a>
+        </div>
+    </div>
 </body>
 </html>
