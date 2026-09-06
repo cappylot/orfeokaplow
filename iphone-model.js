@@ -32,7 +32,119 @@ function slab(w, h, r, depth, mat, name, bevel = 0.0004) {
   const m = new THREE.Mesh(g, mat); m.name = name; return m;
 }
 
-export function buildPhone(screenTexture) {
+/* --- back-glass engraving -------------------------------------------------
+   A laser etch changes the surface, not the colour. These maps drive bump,
+   roughness and metalness from the portrait, so the figure catches raking light
+   and all but vanishes head-on — the way a real engraving does. */
+const ETCH = {
+  width:  1.00,     // edge to edge across the back panel
+  centre: 0.37,     // centred in the space left under the camera plateau
+  floor:  0.16,     // shallowest cut, so the whole silhouette still reads
+  gamma:  1.85,     // tonal contrast of the etch
+  slope:  9.00,     // how sharply the walls of the cut turn the normal
+  rough:  0.92,     // the frosted floor scatters; bare glass is 0.32
+  metal:  0.00,     // ...and holds no specular metal at all
+  tint:   0.26      // frost lift, on top of the relief
+};
+
+function alphaBounds(d, w, h) {
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    if (d[(y * w + x) * 4 + 3] <= 16) continue;
+    if (x < x0) x0 = x; if (x > x1) x1 = x;
+    if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  return x1 < 0 ? { x: 0, y: 0, w, h } : { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+}
+
+function canvasTex(canvas, srgb) {
+  const t = new THREE.CanvasTexture(canvas);
+  t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+  t.anisotropy = 16;
+  t.minFilter = THREE.LinearMipmapLinearFilter;
+  return t;
+}
+
+/* returns a back-glass material with the portrait etched into it */
+function engravedBack(img, base, panelW, panelH) {
+  const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+
+  // trim the cutout to its opaque bounds so the figure sits centred on the glass
+  const src = document.createElement('canvas');
+  src.width = img.width; src.height = img.height;
+  const sctx = src.getContext('2d', { willReadFrequently: true });
+  sctx.drawImage(img, 0, 0);
+  const box = alphaBounds(sctx.getImageData(0, 0, src.width, src.height).data, src.width, src.height);
+
+  // one texel grid across the whole panel, so every map shares its UVs
+  const TW = 1024, TH = Math.round(TW * panelH / panelW);
+  const cut = document.createElement('canvas');
+  cut.width = TW; cut.height = TH;
+  const ctx = cut.getContext('2d', { willReadFrequently: true });
+
+  const dw = ETCH.width * TW, dh = dw * box.h / box.w;
+  ctx.drawImage(img, box.x, box.y, box.w, box.h,
+                (TW - dw) / 2, TH * (1 - ETCH.centre) - dh / 2, dw, dh);
+
+  /* depth of cut per texel: a laser bites hardest where the photograph is
+     darkest, and a floor under the whole silhouette keeps the figure a shape
+     rather than a scatter of dark features */
+  const px = ctx.getImageData(0, 0, TW, TH).data;
+  const cutDepth = new Float32Array(TW * TH);
+  for (let i = 0, j = 0; j < cutDepth.length; i += 4, j++) {
+    const lum = (0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]) / 255;
+    const tone = clamp01(0.5 + (0.5 - lum) * ETCH.gamma);
+    cutDepth[j] = (px[i + 3] / 255) * (ETCH.floor + (1 - ETCH.floor) * tone);
+  }
+
+  const mk = () => { const c = document.createElement('canvas'); c.width = TW; c.height = TH; return c; };
+  const nrmC = mk(), ormC = mk(), albC = mk();
+  const nrm = nrmC.getContext('2d').createImageData(TW, TH);
+  const orm = ormC.getContext('2d').createImageData(TW, TH);
+  const alb = albC.getContext('2d').createImageData(TW, TH);
+
+  const col = base.color, bR = col.r * 255, bG = col.g * 255, bB = col.b * 255;
+  const bRough = base.roughness, bMetal = base.metalness;
+  const at = (x, y) => cutDepth[Math.min(TH - 1, Math.max(0, y)) * TW + Math.min(TW - 1, Math.max(0, x))];
+
+  for (let y = 0, j = 0; y < TH; y++) for (let x = 0; x < TW; x++, j++) {
+    const e = cutDepth[j], i = j * 4;
+
+    // tangent-space normal from the slope of the cut (v runs up, rows run down)
+    const gx = (at(x + 1, y) - at(x - 1, y)) * 0.5 * ETCH.slope;
+    const gy = (at(x, y - 1) - at(x, y + 1)) * 0.5 * ETCH.slope;
+    const inv = 1 / Math.hypot(gx, gy, 1);
+    nrm.data[i]     = (gx * inv * 0.5 + 0.5) * 255;
+    nrm.data[i + 1] = (gy * inv * 0.5 + 0.5) * 255;
+    nrm.data[i + 2] = (inv * 0.5 + 0.5) * 255;
+    nrm.data[i + 3] = 255;
+
+    orm.data[i] = 255;                             // ao, unused
+    orm.data[i + 1] = 255 * (bRough + e * (ETCH.rough - bRough));
+    orm.data[i + 2] = 255 * (bMetal + e * (ETCH.metal - bMetal));
+    orm.data[i + 3] = 255;
+
+    const f = e * ETCH.tint;                       // frost lifts the glass a little
+    alb.data[i]     = bR + (255 - bR) * f;
+    alb.data[i + 1] = bG + (255 - bG) * f;
+    alb.data[i + 2] = bB + (255 - bB) * f;
+    alb.data[i + 3] = 255;
+  }
+  nrmC.getContext('2d').putImageData(nrm, 0, 0);
+  ormC.getContext('2d').putImageData(orm, 0, 0);
+  albC.getContext('2d').putImageData(alb, 0, 0);
+
+  const m = base.clone();
+  m.name = 'backGlassEngraved';
+  m.color.set(0xffffff);                 // the colour now comes from the map
+  m.map = canvasTex(albC, true);
+  m.normalMap = canvasTex(nrmC, false);
+  m.roughnessMap = m.metalnessMap = canvasTex(ormC, false);
+  m.roughness = m.metalness = 1;         // both are carried by the map
+  return m;
+}
+
+export function buildPhone(screenTexture, portrait) {
   const { W, H, D, R, SIDE } = DIM;
 
   const M = {
@@ -65,7 +177,9 @@ export function buildPhone(screenTexture) {
   display.position.z = D / 2 + 0.00022;
   phone.add(display);
 
-  const back = panel(W - 0.0008, H - 0.0008, R - 0.0004, M.backGlass, 'back_glass');
+  const backW = W - 0.0008, backH = H - 0.0008;
+  const backMat = portrait ? engravedBack(portrait, M.backGlass, backW, backH) : M.backGlass;
+  const back = panel(backW, backH, R - 0.0004, backMat, 'back_glass');
   back.position.z = -D / 2 - 0.00012;
   back.rotation.y = Math.PI;
   phone.add(back);
@@ -138,6 +252,16 @@ export function buildPhone(screenTexture) {
   phone.add(grille);
 
   return phone;
+}
+
+export function loadImage(url) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => res(img);
+    img.onerror = () => rej(new Error(`could not load ${url}`));
+    img.src = url;
+  });
 }
 
 export async function loadScreenTexture(url = './assets/screen.png') {

@@ -342,7 +342,7 @@
 
 <script type="module">
 import * as THREE from 'three';
-import { buildPhone, loadScreenTexture } from './iphone-model.js';
+import { buildPhone, loadScreenTexture, loadImage } from './iphone-model.js';
 
 const host = document.getElementById('stage');
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -373,8 +373,11 @@ const SCREENS = [
   { app: 'Chess Manager', url: './assets/screen-chessmanager.png' },
   { app: 'Armadillo',     url: './assets/screen-armadillo.png' }
 ];
-const textures = await Promise.all(SCREENS.map(s => loadScreenTexture(s.url)));
-const phone = buildPhone(textures[0]);
+const [textures, portrait] = await Promise.all([
+  Promise.all(SCREENS.map(s => loadScreenTexture(s.url))),
+  loadImage('./assets/Subject.png').catch(() => null)   // etched into the back glass
+]);
+const phone = buildPhone(textures[0], portrait);
 pivot.add(phone);
 
 const display = phone.getObjectByName('display');
