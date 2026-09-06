@@ -71,6 +71,14 @@
   #stage{position:fixed; inset:0; z-index:2; pointer-events:none}
   #stage canvas{display:block; width:100%; height:100%}
 
+  /* annotation pinned to the engraving on the back glass */
+  #callout{position:fixed; inset:0; width:100%; height:100%; z-index:3; pointer-events:none;
+    opacity:0; overflow:visible}
+  #callout path{fill:none; stroke:var(--steel-hi); stroke-width:1; stroke-dasharray:1}
+  #callout circle{fill:var(--accent-hi)}
+  #callout text{font-family:var(--mono); font-size:10.5px; letter-spacing:.2em;
+    text-transform:uppercase; fill:var(--steel-hi)}
+
   /* ---------- chrome ---------- */
   header{position:fixed; inset:0 0 auto 0; z-index:8; display:flex; align-items:center;
     justify-content:space-between; gap:18px; padding:22px clamp(20px,4vw,54px)}
@@ -208,6 +216,12 @@
 <div class="bg" id="bg3"></div>
 
 <div id="stage"></div>
+
+<svg id="callout" aria-hidden="true">
+  <path pathLength="1"></path>
+  <circle r="2.5"></circle>
+  <text>That&#39;s me</text>
+</svg>
 <div class="vignette"></div>
 <div class="grain"></div>
 
@@ -342,7 +356,7 @@
 
 <script type="module">
 import * as THREE from 'three';
-import { buildPhone, loadScreenTexture, loadImage } from './iphone-model.js';
+import { buildPhone, loadScreenTexture, loadImage, DIM } from './iphone-model.js';
 
 const host = document.getElementById('stage');
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -379,6 +393,12 @@ const [textures, portrait] = await Promise.all([
 ]);
 const phone = buildPhone(textures[0], portrait);
 pivot.add(phone);
+
+/* an empty child riding on the etched head, so the callout below can find it
+   on screen through every turn and rescale the phone makes */
+const headAnchor = new THREE.Object3D();
+headAnchor.position.set(-0.0124, 0.0069, -DIM.D / 2 - 0.0002);
+phone.add(headAnchor);
 
 const display = phone.getObjectByName('display');
 const displayMat = display.material;
@@ -499,6 +519,51 @@ const bgs = [
   { el: document.getElementById('bg3'), k: 0.95 }
 ];
 
+/* --- "that's me" callout -------------------------------------------------
+   The phone reaches its far-left extreme at p = 0.20, back turned to the
+   reader with the engraving facing out. The leader draws itself on as that
+   swing completes and erases as the phone leaves, so it belongs to the motion
+   rather than sitting there as a label. */
+const CALL = { at: 0.20, in: 0.06, out: 0.08, leg: 0.055, gap: 12 };
+const callout = document.getElementById('callout');
+const callLine = callout.querySelector('path');
+const callDot = callout.querySelector('circle');
+const callText = callout.querySelector('text');
+const ndc = new THREE.Vector3();
+let labelW = 78;
+document.fonts.ready.then(() => { labelW = callText.getComputedTextLength() || labelW; });
+
+function drawCallout() {
+  // a bump centred on the extreme: in on approach, out on departure
+  const d = progress - CALL.at;
+  const raw = d <= 0 ? 1 + d / CALL.in : 1 - d / CALL.out;
+  const reveal = ease(Math.min(1, Math.max(0, raw)));
+  if (reveal <= 0.001) { callout.style.opacity = '0'; return; }
+
+  headAnchor.getWorldPosition(ndc).project(camera);
+  if (ndc.z > 1) { callout.style.opacity = '0'; return; }   // behind the camera
+  const ax = (ndc.x * 0.5 + 0.5) * innerWidth;
+  const ay = (-ndc.y * 0.5 + 0.5) * innerHeight;
+
+  const leg = Math.max(34, Math.min(80, innerWidth * CALL.leg));
+  const tail = labelW + CALL.gap;
+  // lead away from the nearer edge, and turn down if there is no room above
+  let dir = ax < innerWidth / 2 ? 1 : -1;
+  if (ax + dir * (leg + tail + 24) > innerWidth || ax + dir * (leg + tail + 24) < 0) dir = -dir;
+  const up = ay > innerHeight * 0.32 ? -1 : 1;
+
+  const ex = ax + dir * leg, ey = ay + up * leg;
+  callLine.setAttribute('d', `M${ax} ${ay} L${ex} ${ey} L${ex + dir * tail} ${ey}`);
+  callLine.style.strokeDashoffset = String(1 - reveal);
+  callDot.setAttribute('cx', ax); callDot.setAttribute('cy', ay);
+  callText.setAttribute('x', ex + dir * (CALL.gap / 2));
+  callText.setAttribute('y', ey - 7);
+  callText.setAttribute('text-anchor', dir > 0 ? 'start' : 'end');
+  // the label only arrives once the line has reached it
+  callText.style.opacity = String(Math.max(0, (reveal - 0.55) / 0.45));
+  callout.style.opacity = String(Math.min(1, reveal * 2.2));
+}
+
 function tick() {
   const max = document.documentElement.scrollHeight - innerHeight;
   progress = max > 0 ? scrollY / max : 0;
@@ -525,6 +590,7 @@ function tick() {
   display.visible = facing > 0.04;   // fully dark through every hand-off
 
   for (const b of bgs) b.el.style.transform = `translate3d(0,${-progress * innerHeight * b.k}px,0)`;
+  drawCallout();
 
   renderer.render(scene, camera);
   requestAnimationFrame(tick);

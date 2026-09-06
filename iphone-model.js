@@ -44,7 +44,8 @@ const ETCH = {
   slope:  9.00,     // how sharply the walls of the cut turn the normal
   rough:  0.92,     // the frosted floor scatters; bare glass is 0.32
   metal:  0.00,     // ...and holds no specular metal at all
-  tint:   0.26      // frost lift, on top of the relief
+  tint:   0.26,     // frost lift, on top of the relief
+  colour: 0.45      // how much of the photograph's own hue survives the cut
 };
 
 function alphaBounds(d, w, h) {
@@ -68,6 +69,7 @@ function canvasTex(canvas, srgb) {
 /* returns a back-glass material with the portrait etched into it */
 function engravedBack(img, base, panelW, panelH) {
   const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+  const clamp255 = v => v < 0 ? 0 : v > 255 ? 255 : v;
 
   // trim the cutout to its opaque bounds so the figure sits centred on the glass
   const src = document.createElement('canvas');
@@ -124,10 +126,16 @@ function engravedBack(img, base, panelW, panelH) {
     orm.data[i + 2] = 255 * (bMetal + e * (ETCH.metal - bMetal));
     orm.data[i + 3] = 255;
 
-    const f = e * ETCH.tint;                       // frost lifts the glass a little
-    alb.data[i]     = bR + (255 - bR) * f;
-    alb.data[i + 1] = bG + (255 - bG) * f;
-    alb.data[i + 2] = bB + (255 - bB) * f;
+    /* the frost lifts the glass toward white by the depth of the cut, then a
+       trace of the photograph's own hue is laid over it. The hue follows the
+       figure rather than the cut: the warmth lives in the skin, which is where
+       the laser bites least, so keying it to depth would throw the colour away */
+    const f = e * ETCH.tint;
+    const sl = Math.max(8, 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]);
+    const hue = (px[i + 3] / 255) * ETCH.colour;
+    alb.data[i]     = clamp255((bR + (255 - bR) * f) * (1 + (px[i] / sl - 1) * hue));
+    alb.data[i + 1] = clamp255((bG + (255 - bG) * f) * (1 + (px[i + 1] / sl - 1) * hue));
+    alb.data[i + 2] = clamp255((bB + (255 - bB) * f) * (1 + (px[i + 2] / sl - 1) * hue));
     alb.data[i + 3] = 255;
   }
   nrmC.getContext('2d').putImageData(nrm, 0, 0);
