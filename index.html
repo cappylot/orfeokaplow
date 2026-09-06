@@ -8,6 +8,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Newsreader:ital,opsz,wght@1,6..72,300..500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  /* land at the top on every visit: the scroll-driven phone reads scrollY, so a
+     browser-restored offset would drop the reader mid-sequence */
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (!location.hash) {
+    const top = () => scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    top();
+    addEventListener('load', top);
+  }
+</script>
 <script type="importmap">
 {
   "imports": {
@@ -395,7 +405,7 @@ const KEYS = [
   { p: 0.60, fx:  0.76, fy: -0.06, ry:  540 * D, rx:  2 * D, rz:  6 * D, fh: 0.50 },
   { p: 0.80, fx:  0.56, fy:  0.00, ry:  720 * D, rx:  0 * D, rz:  0 * D, fh: 0.86 },
   { p: 0.90, fx:  0.30, fy:  0.16, ry:  900 * D, rx: -5 * D, rz: -4 * D, fh: 0.74 },
-  { p: 1.00, fx:  0.00, fy:  0.52, ry: 1080 * D, rx:  0 * D, rz:  0 * D, fh: 0.38 }
+  { p: 1.00, fx:  0.00, fy:  0.46, ry: 1080 * D, rx:  0 * D, rz:  0 * D, fh: 0.38 }
 ];
 /* mobile / short-viewport framing: phone parked above the copy, centred */
 const NARROW = { fx: 0.00, fyBias: 0.30, fh: 0.42 };
@@ -430,17 +440,38 @@ function resize() {
   narrow = innerWidth < 900 || camera.aspect < 1.05;
 }
 
+/* The closing frame is anchored to the contact copy instead of to a fixed
+   fraction: that copy sits at a viewport-height-dependent offset, so a constant
+   fy opens a gulf above it on tall windows and collides with it on short ones. */
+const tail = document.querySelector('#contact .kicker');
+const TAIL_TOP = 0.09;    // clear the fixed header
+const TAIL_GAP = 0.025;   // breathing room above the copy
+
 /* place the phone from a keyframe: size it against the viewport, then keep it
    inside the frustum whatever the aspect ratio */
-function frame(t) {
-  const fh = narrow ? NARROW.fh : t.fh;
+function frame(t, p) {
+  let fh = narrow ? NARROW.fh : t.fh;
+  const fx = narrow ? NARROW.fx : t.fx;
+  let fy = narrow ? clamp(t.fy + NARROW.fyBias, -0.5, 0.5) : t.fy;
+
+  // over the last stretch, drop the phone into the band above the contact copy
+  const w = tail && p > 0.9 ? ease(Math.min(1, (p - 0.9) / 0.1)) : 0;
+  if (w > 0) {
+    const foot = tail.getBoundingClientRect().top / innerHeight - TAIL_GAP;
+    const band = foot - TAIL_TOP;
+    if (band > 0.12) {
+      const fit = Math.min(fh, band);
+      fh = lerp(fh, fit, w);
+      // sit on the floor of the band, so the gap above the copy stays constant
+      fy = lerp(fy, (0.5 - (foot - fit / 2)) * 2, w);
+    }
+  }
+
   // fit by height, but never let it grow wider than a share of the viewport
   const maxW = (narrow ? 0.62 : 0.40) * view.w;
   const s = Math.min(fh * view.h / PH, maxW / PW);
 
   const halfW = (PW * s) / 2, halfH = (PH * s) / 2;
-  const fx = narrow ? NARROW.fx : t.fx;
-  const fy = narrow ? clamp(t.fy + NARROW.fyBias, -0.5, 0.5) : t.fy;
 
   // allow a small bleed off the side edges, keep it fully on screen vertically
   const xLim = Math.max(0, view.w / 2 - halfW * 0.55);
@@ -469,7 +500,7 @@ function tick() {
   const max = document.documentElement.scrollHeight - innerHeight;
   progress = max > 0 ? scrollY / max : 0;
 
-  const t = frame(sample(progress));
+  const t = frame(sample(progress), progress);
   const k = initialised ? (reduce ? 1 : 0.085) : 1;
   cur.x = lerp(cur.x, t.x, k);
   cur.y = lerp(cur.y, t.y, k);
