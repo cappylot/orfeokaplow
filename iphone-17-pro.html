@@ -2,21 +2,49 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0b">
 <title>iPhone 17 Pro — 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600..800&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
 <style>
-  html,body{margin:0;height:100%;background:#e9e7e2}
+  html,body{margin:0;height:100%;background:#e9e7e2;overflow:hidden}
   three-d-stage:not(:defined){visibility:hidden}
-  three-d-stage{display:block;width:100vw;height:100vh}
+  three-d-stage{display:block;width:100vw;height:100svh;touch-action:none}
+  .back{position:fixed;z-index:2;left:20px;top:calc(18px + env(safe-area-inset-top));
+    font:700 14px/1 "Manrope",system-ui,-apple-system,sans-serif;letter-spacing:-.01em;
+    color:#111;text-decoration:none;padding:4px 0}
 </style>
 </head>
 <body>
+<a class="back" href="index.html#device">← Orfeo Kaplow</a>
 <three-d-stage name="iphone-17-pro" background="#e9e7e2" autorotate></three-d-stage>
 <script src="./three-d-stage.js"></script>
 <script type="module">
-import { buildPhone } from './phone-model.js';
+import { buildPhone, loadScreenTexture, loadImage } from './iphone-model.js';
 const stage = document.querySelector('three-d-stage');
-const { THREE } = await stage.ready;
-const phone = await buildPhone(THREE, './assets/screen.png');
+await stage.ready;
+const [screen, portrait] = await Promise.all([
+  loadScreenTexture('./assets/screen.png'),
+  loadImage('./assets/Subject.png').catch(() => null)
+]);
+const phone = buildPhone(screen, portrait);
 phone.rotation.x = -0.02;
 stage.setObject(phone);
 </script>
